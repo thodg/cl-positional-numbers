@@ -1,16 +1,4 @@
 
-(in-package :cl)
-
-(defpackage :positional
-  (:use :cl)
-  (:export
-   #:*integer-base*
-   #:integer-base
-   #:base-parse
-   #:base-positional
-   #:parse
-   #:positional))
-
 (in-package :positional)
 
 (defgeneric base-parse (base input))
