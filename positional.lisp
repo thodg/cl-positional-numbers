@@ -3,7 +3,13 @@
 
 (defpackage :positional
   (:use :cl)
-  (:export #:parse))
+  (:export
+   #:*integer-base*
+   #:integer-base
+   #:base-parse
+   #:base-positional
+   #:parse
+   #:positional))
 
 (in-package :positional)
 
@@ -19,11 +25,8 @@
         (t
          (error "Undefined integer base ~D" base))))
 
-#+test
-(integer-base 10)
-#+test
-
-(integer-base 16)
+#+nil (integer-base 10)
+#+nil (integer-base 16)
 
 (defmethod base-parse ((base integer) input)
   (base-parse (integer-base base) input))
@@ -47,14 +50,31 @@
 (defun parse (input &optional (base 10))
   (base-parse base input))
 
-#+test (parse "123")
-#+test (parse "10" 16)
+#+nil (parse "123")
+#+nil (parse "DEADBEEF" 16)
 
 (defmethod base-positional ((base string) (number integer))
-  (with-output-to-string 
+  (let* ((base-n (length base))
+         (out-n (ceiling (log number base-n)))
+         (out (make-string out-n :initial-element (char base 0)))
+         (i (1- out-n)))
+    (loop
+       (when (= number 0)
+         (return out))
+       (when (< i 0)
+         (error "bad math"))
+       (multiple-value-bind (q r) (floor number base-n)
+         (setf number q
+               (char out i) (char base r)))
+       (decf i))))
+
+#+nil (base-positional (integer-base 16) 100)
 
 (defmethod base-positional ((base integer) number)
   (base-positional (integer-base base) number))
 
 (defun positional (number &optional (base 10))
   (base-positional base number))
+
+#+nil (positional 123)
+#+nil (positional 3735928559 16)
