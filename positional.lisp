@@ -21,11 +21,38 @@
 (defvar *integer-base*
   "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz")
 
+(defparameter *integer-base-cache*
+  (cons *integer-base*
+        (make-array `(,(length *integer-base*))
+                    :initial-element nil)))
+
+(defun update-integer-base-cache (ib)
+  (declare (type string ib))
+  (let ((ibc *integer-base-cache*)
+        (ib-n (length ib)))
+    (setf (first ibc) ib)
+    (if (= ib-n (length (the simple-vector (rest ibc))))
+        (let ((i 0))
+          (loop (unless (< i ib-n) (return))
+             (setf (svref (rest ibc) i) nil)
+             (incf i)))
+        (setf (rest ibc)
+              (make-array `(,ib-n) :initial-element nil)))))
+
 (defun integer-base (base)
-  (cond ((< base (length *integer-base*))
-         (subseq *integer-base* 0 base))
-        (t
-         (error "Undefined integer base ~D" base))))
+  (declare (type fixnum base))
+  (let* ((ib *integer-base*)
+         (ibc *integer-base-cache*))
+    (unless (<= 2 base (length ib))
+      (error "Undefined integer base ~D" base))
+    (or (cond ((= base (length ib)) ib)
+              ((eq ib (first ibc))
+               (svref (rest ibc) (1- base)))
+              (t (update-integer-base-cache ib) nil))
+        (setf (svref (rest ibc) (1- base))
+              (let ((b (subseq ib 0 base)))
+                (format t "~&IB ~S b ~S~%" ib b)
+                b)))))
 
 #+nil (integer-base 10)
 #+nil (integer-base 16)
