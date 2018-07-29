@@ -16,6 +16,8 @@
 (defgeneric base-parse (base input))
 (defgeneric base-positional (base number))
 
+(declaim (type simple-string *integer-base*))
+
 (defvar *integer-base*
   "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz")
 
