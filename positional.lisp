@@ -71,19 +71,24 @@
 #+nil (parse "DEADBEEF" 16)
 
 (defmethod base-positional ((base string) (number integer))
-  (let* ((base-n (length base))
-         (out-n (ceiling (log number base-n)))
-         (out (make-string out-n :initial-element (char base 0)))
-         (i (1- out-n)))
-    (loop
-       (when (= number 0)
-         (return out))
-       (when (< i 0)
-         (error "bad math"))
-       (multiple-value-bind (q r) (floor number base-n)
-         (setf number q
-               (char out i) (char base r)))
-       (decf i))))
+  (cond ((< number 0)
+         (concatenate 'string "-" (base-positional base (- number))))
+        ((= number 0)
+         (make-string 1 :initial-element (char base 0)))
+        (t
+         (let* ((base-n (length base))
+                (out-n (ceiling (log number base-n)))
+                (out (make-string out-n :initial-element (char base 0)))
+                (i (1- out-n)))
+           (loop
+              (when (= number 0)
+                (return out))
+              (when (< i 0)
+                (error "bad math"))
+              (multiple-value-bind (q r) (floor number base-n)
+                (setf number q
+                      (char out i) (char base r)))
+              (decf i))))))
 
 #+nil (base-positional (integer-base 16) 100)
 
