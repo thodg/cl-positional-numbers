@@ -77,7 +77,7 @@
          (make-string 1 :initial-element (char base 0)))
         (t
          (let* ((base-n (length base))
-                (out-n (ceiling (log number base-n)))
+                (out-n (1+ (floor (log number base-n))))
                 (out (make-string out-n :initial-element (char base 0)))
                 (i (1- out-n)))
            (loop
