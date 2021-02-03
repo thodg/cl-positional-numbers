@@ -75,6 +75,8 @@
          (concatenate 'string "-" (base-positional base (- number))))
         ((= number 0)
          (make-string 1 :initial-element (char base 0)))
+        ((= 1 (length base))
+         (make-string number :initial-element (char base 0)))
         (t
          (let* ((base-n (length base))
                 (out-n (1+ (floor (log number base-n))))
