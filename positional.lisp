@@ -102,3 +102,37 @@
 
 #+nil (positional 123)
 #+nil (positional 3735928559 16)
+#+nil (positional 0 9)
+#+nil (positional 9 9)
+#+nil (positional 99 9)
+#+nil (positional 9000 9)
+
+(defmethod base-quote ((base string) (number integer))
+  (cond ((< number 0)
+         (concatenate 'string "-" (base-quote base (- number))))
+        ((= 1 (length base))
+         (error "cannot quote base 1"))
+        (t
+         (let* ((base-n (length base))
+                (positional (base-positional base number))
+                (prefix (make-string (length positional)
+                                     :initial-element (char base (1- base-n))))
+                (separator (make-string 1 :initial-element (char base 0))))
+           (concatenate 'string prefix separator positional)))))
+
+(defmethod base-quote ((base integer) number)
+  (base-quote (integer-base base) number))
+
+(defun quoted (number &optional (base 10))
+  (base-quote base number))
+
+#+nil (quoted 0)
+#+nil (quoted 123)
+#+nil (quoted 0 2)
+#+nil (quoted 1 2)
+#+nil (quoted 9 9)
+#+nil (quoted 99 9)
+#+nil (quoted 9000 9)
+#+nil (quoted 9 2)
+#+nil (quoted 99 2)
+#+nil (quoted 9000 2)
