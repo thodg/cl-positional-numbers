@@ -69,6 +69,52 @@
 
 #+nil (parse "123")
 #+nil (parse "DEADBEEF" 16)
+#+nil (parse "444" 9)
+
+(defun parse-min-integer-base (input)
+  (let ((max 0))
+    (dotimes (i (length input))
+      (let* ((c (char input i))
+             (b (position c *integer-base*)))
+        (when (< max b)
+          (setq max b))))
+    (base-parse (1+ max) input)))
+
+#+nil (parse-min-integer-base "131")
+#+nil (parse-min-integer-base "132")
+#+nil (parse-min-integer-base "123")
+#+nil (parse-min-integer-base "126")
+#+nil (parse-min-integer-base "444")
+
+(defun parse-min-base (input)
+  (let ((base ""))
+    (dotimes (i (length input))
+      (let* ((c (char input i))
+             (b (position c base)))
+        (unless b
+          (setq base (concatenate 'string
+                                  base
+                                  (make-string 1 :initial-element c))))))
+    (parse input base)))
+
+#+nil (parse-min-base "0")           ;          0
+#+nil (parse-min-base "01")          ;          1        0
+#+nil (parse-min-base "010")
+#+nil (parse-min-base "011")
+#+nil (parse-min-base "012")         ;          5        0
+#+nil (parse-min-base "0123")        ;         27        1     0
+#+nil (parse-min-base "01234")       ;        194        5     0
+#+nil (parse-min-base "342391")
+#+nil (parse-min-base "012345")      ;       1865       27     1   0
+#+nil (parse-min-base "0123456")     ;      22875       27     1   0
+#+nil (parse-min-base "01234567")    ;     342391      894     5   0
+#+nil (parse-min-base "4874")
+#+nil (parse-min-base "6053444")
+#+nil (parse-min-base "21908410")
+#+nil (parse-min-base "012345678")   ;    6053444     4874    15   1 0
+#+nil (parse-min-base "2853116705")
+#+nil (parse-min-base "0123456789")  ;  123456789  6053444  4874  15 1 0
+#+nil (parse-min-base "0123456789A") ; 2853116705 21908410 67149 194 5 0
 
 (defmethod base-positional ((base string) (number integer))
   (cond ((< number 0)
@@ -132,6 +178,7 @@
 #+nil (quoted 1 2)
 #+nil (quoted 9 9)
 #+nil (quoted 99 9)
+#+nil (quoted 364 9)
 #+nil (quoted 9000 9)
 #+nil (quoted 9 2)
 #+nil (quoted 99 2)
